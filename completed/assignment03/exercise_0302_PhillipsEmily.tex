@@ -1,0 +1,515 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{lmodern}
+\usepackage{ifxetex,ifluatex}
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\hypersetup{
+  pdftitle={exercise\_0302\_PhillipsEmily.R},
+  pdfauthor={holmk},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+\urlstyle{same} % disable monospaced font for URLs
+\usepackage[margin=1in]{geometry}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\ifluatex
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+
+\title{exercise\_0302\_PhillipsEmily.R}
+\author{holmk}
+\date{2021-06-27}
+
+\begin{document}
+\maketitle
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Assignment: 3.2 Exercise}
+\CommentTok{\# Name: Phillips, Emily}
+\CommentTok{\# Date: 2010{-}06{-}26}
+
+\CommentTok{\#install.packages(\textquotesingle{}tinytex\textquotesingle{})}
+\FunctionTok{library}\NormalTok{(tinytex)}
+
+\DocumentationTok{\#\# Set the working directory to the root of your DSC 520 directory}
+\FunctionTok{setwd}\NormalTok{(}\StringTok{"C:/Users/holmk/OneDrive/Desktop/DSC520 {-} Statistics/classRepo/dsc520/"}\NormalTok{)}
+
+\DocumentationTok{\#\# Load the \textasciigrave{}data/r4ds/heights.csv\textasciigrave{} to}
+\NormalTok{community\_df }\OtherTok{\textless{}{-}} \FunctionTok{read.csv}\NormalTok{(}\StringTok{"http://content.bellevue.edu/cst/dsc/520/id/resources/acs{-}14{-}1yr{-}s0201.csv"}\NormalTok{)}
+
+\CommentTok{\#Fetching column names of the dataframe}
+\FunctionTok{names}\NormalTok{(community\_df)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "Id"                     "Id2"                    "Geography"             
+## [4] "PopGroupID"             "POPGROUP.display.label" "RacesReported"         
+## [7] "HSDegree"               "BachDegree"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#Categories}
+\CommentTok{\#Geography {-}{-} states in the United States}
+\FunctionTok{unique}\NormalTok{(community\_df[}\FunctionTok{c}\NormalTok{(}\StringTok{"Geography"}\NormalTok{)])}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##                                      Geography
+## 1                    Jefferson County, Alabama
+## 2                     Maricopa County, Arizona
+## 3                         Pima County, Arizona
+## 4                   Alameda County, California
+## 5              Contra Costa County, California
+## 6                    Fresno County, California
+## 7                      Kern County, California
+## 8               Los Angeles County, California
+## 9                    Orange County, California
+## 10                Riverside County, California
+## 11               Sacramento County, California
+## 12           San Bernardino County, California
+## 13                San Diego County, California
+## 14            San Francisco County, California
+## 15              San Joaquin County, California
+## 16                San Mateo County, California
+## 17              Santa Clara County, California
+## 18                   Sonoma County, California
+## 19               Stanislaus County, California
+## 20                  Ventura County, California
+## 21                   Arapahoe County, Colorado
+## 22                     Denver County, Colorado
+## 23                    El Paso County, Colorado
+## 24                  Jefferson County, Colorado
+## 25               Fairfield County, Connecticut
+## 26                Hartford County, Connecticut
+## 27               New Haven County, Connecticut
+## 28                 New Castle County, Delaware
+## 29  District of Columbia, District of Columbia
+## 30                     Brevard County, Florida
+## 31                     Broward County, Florida
+## 32                       Duval County, Florida
+## 33                Hillsborough County, Florida
+## 34                         Lee County, Florida
+## 35                  Miami-Dade County, Florida
+## 36                      Orange County, Florida
+## 37                  Palm Beach County, Florida
+## 38                    Pinellas County, Florida
+## 39                        Polk County, Florida
+## 40                     Volusia County, Florida
+## 41                        Cobb County, Georgia
+## 42                      DeKalb County, Georgia
+## 43                      Fulton County, Georgia
+## 44                    Gwinnett County, Georgia
+## 45                     Honolulu County, Hawaii
+## 46                       Cook County, Illinois
+## 47                     DuPage County, Illinois
+## 48                       Kane County, Illinois
+## 49                       Lake County, Illinois
+## 50                       Will County, Illinois
+## 51                      Marion County, Indiana
+## 52                      Johnson County, Kansas
+## 53                     Sedgwick County, Kansas
+## 54                  Jefferson County, Kentucky
+## 55               Anne Arundel County, Maryland
+## 56                  Baltimore County, Maryland
+## 57                 Montgomery County, Maryland
+## 58            Prince George's County, Maryland
+## 59                    Baltimore city, Maryland
+## 60               Bristol County, Massachusetts
+## 61                 Essex County, Massachusetts
+## 62             Middlesex County, Massachusetts
+## 63               Norfolk County, Massachusetts
+## 64              Plymouth County, Massachusetts
+## 65               Suffolk County, Massachusetts
+## 66             Worcester County, Massachusetts
+## 67                       Kent County, Michigan
+## 68                     Macomb County, Michigan
+## 69                    Oakland County, Michigan
+## 70                      Wayne County, Michigan
+## 71                  Hennepin County, Minnesota
+## 72                    Ramsey County, Minnesota
+## 73                    Jackson County, Missouri
+## 74                  St. Louis County, Missouri
+## 75                    Douglas County, Nebraska
+## 76                        Clark County, Nevada
+## 77                   Bergen County, New Jersey
+## 78                   Camden County, New Jersey
+## 79                    Essex County, New Jersey
+## 80                   Hudson County, New Jersey
+## 81                Middlesex County, New Jersey
+## 82                 Monmouth County, New Jersey
+## 83                    Ocean County, New Jersey
+## 84                  Passaic County, New Jersey
+## 85                    Union County, New Jersey
+## 86               Bernalillo County, New Mexico
+## 87                      Bronx County, New York
+## 88                       Erie County, New York
+## 89                      Kings County, New York
+## 90                     Monroe County, New York
+## 91                     Nassau County, New York
+## 92                   New York County, New York
+## 93                     Queens County, New York
+## 94                    Suffolk County, New York
+## 95                Westchester County, New York
+## 96             Guilford County, North Carolina
+## 97          Mecklenburg County, North Carolina
+## 98                 Wake County, North Carolina
+## 99                       Cuyahoga County, Ohio
+## 100                      Franklin County, Ohio
+## 101                      Hamilton County, Ohio
+## 102                    Montgomery County, Ohio
+## 103                        Summit County, Ohio
+## 104                  Oklahoma County, Oklahoma
+## 105                     Tulsa County, Oklahoma
+## 106                   Multnomah County, Oregon
+## 107                  Washington County, Oregon
+## 108             Allegheny County, Pennsylvania
+## 109                 Bucks County, Pennsylvania
+## 110               Chester County, Pennsylvania
+## 111              Delaware County, Pennsylvania
+## 112             Lancaster County, Pennsylvania
+## 113            Montgomery County, Pennsylvania
+## 114          Philadelphia County, Pennsylvania
+## 115            Providence County, Rhode Island
+## 116                 Davidson County, Tennessee
+## 117                   Shelby County, Tennessee
+## 118                        Bexar County, Texas
+## 119                       Collin County, Texas
+## 120                       Dallas County, Texas
+## 121                       Denton County, Texas
+## 122                      El Paso County, Texas
+## 123                    Fort Bend County, Texas
+## 124                       Harris County, Texas
+## 125                      Hidalgo County, Texas
+## 126                   Montgomery County, Texas
+## 127                      Tarrant County, Texas
+## 128                       Travis County, Texas
+## 129                     Salt Lake County, Utah
+## 130                          Utah County, Utah
+## 131                   Fairfax County, Virginia
+## 132                    King County, Washington
+## 133                  Pierce County, Washington
+## 134               Snohomish County, Washington
+## 135                     Dane County, Wisconsin
+## 136                Milwaukee County, Wisconsin
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#POPGROUP.display.label {-}{-} only "Total population"}
+\FunctionTok{unique}\NormalTok{(community\_df[}\FunctionTok{c}\NormalTok{(}\StringTok{"POPGROUP.display.label"}\NormalTok{)])}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##   POPGROUP.display.label
+## 1       Total population
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#What are the elements in your data?}
+\CommentTok{\#Id {-}{-} chr (character)}
+\CommentTok{\#Geography {-}{-} chr (character)}
+\CommentTok{\#POPGROUP.display.label {-}{-} chr (character)}
+\CommentTok{\#HSDegree {-}{-} numeric}
+\CommentTok{\#Id2 {-}{-} integer}
+\CommentTok{\#PopGroupID {-}{-} integer}
+\CommentTok{\#RacesReported {-}{-} integer}
+\CommentTok{\#BachDegree {-}{-} numeric}
+
+\CommentTok{\#Please provide the output from the following functions: str(); nrow(); ncol()}
+\CommentTok{\#Categories and data types of the elements in the dataset}
+\FunctionTok{str}\NormalTok{(community\_df)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 'data.frame':    136 obs. of  8 variables:
+##  $ Id                    : chr  "0500000US01073" "0500000US04013" "0500000US04019" "0500000US06001" ...
+##  $ Id2                   : int  1073 4013 4019 6001 6013 6019 6029 6037 6059 6065 ...
+##  $ Geography             : chr  "Jefferson County, Alabama" "Maricopa County, Arizona" "Pima County, Arizona" "Alameda County, California" ...
+##  $ PopGroupID            : int  1 1 1 1 1 1 1 1 1 1 ...
+##  $ POPGROUP.display.label: chr  "Total population" "Total population" "Total population" "Total population" ...
+##  $ RacesReported         : int  660793 4087191 1004516 1610921 1111339 965974 874589 10116705 3145515 2329271 ...
+##  $ HSDegree              : num  89.1 86.8 88 86.9 88.8 73.6 74.5 77.5 84.6 80.6 ...
+##  $ BachDegree            : num  30.5 30.2 30.8 42.8 39.7 19.7 15.4 30.3 38 20.7 ...
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#Number of rows}
+\FunctionTok{nrow}\NormalTok{(community\_df)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 136
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#Number of columns}
+\FunctionTok{ncol}\NormalTok{(community\_df)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 8
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#Create a Histogram of the HSDegree variable using the ggplot2 package.}
+\FunctionTok{library}\NormalTok{(ggplot2)}
+\CommentTok{\#number of bins = 11 {-}{-} square root of 136 and round down}
+\CommentTok{\#Each row of data represents a different U.S. city}
+\FunctionTok{head}\NormalTok{(community\_df)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##               Id  Id2                       Geography PopGroupID
+## 1 0500000US01073 1073       Jefferson County, Alabama          1
+## 2 0500000US04013 4013        Maricopa County, Arizona          1
+## 3 0500000US04019 4019            Pima County, Arizona          1
+## 4 0500000US06001 6001      Alameda County, California          1
+## 5 0500000US06013 6013 Contra Costa County, California          1
+## 6 0500000US06019 6019       Fresno County, California          1
+##   POPGROUP.display.label RacesReported HSDegree BachDegree
+## 1       Total population        660793     89.1       30.5
+## 2       Total population       4087191     86.8       30.2
+## 3       Total population       1004516     88.0       30.8
+## 4       Total population       1610921     86.9       42.8
+## 5       Total population       1111339     88.8       39.7
+## 6       Total population        965974     73.6       19.7
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#ggplot(community\_df, aes(x=HSDegree)) + geom\_histogram(bins = 11) + ggtitle(\textquotesingle{}Histogram of HSDegree\textquotesingle{}) + xlab(\textquotesingle{}Percentage of Total City Population with High School Degrees\textquotesingle{}) + ylab(\textquotesingle{}Frequency\textquotesingle{})}
+
+\CommentTok{\# Based on what you see in this histogram, is the data distribution unimodal?}
+\CommentTok{\# Is it approximately symmetrical?}
+\CommentTok{\# Is it approximately bell{-}shaped?}
+\CommentTok{\# Is it approximately normal?}
+\CommentTok{\# If not normal, is the distribution skewed? If so, in which direction?}
+\CommentTok{\# Include a normal curve to the Histogram that you plotted.}
+\CommentTok{\# Explain whether a normal distribution can accurately be used as a model for this data.}
+
+\CommentTok{\#Summary statistics for the different column names}
+\FunctionTok{summary}\NormalTok{(community\_df)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##       Id                 Id2         Geography           PopGroupID
+##  Length:136         Min.   : 1073   Length:136         Min.   :1   
+##  Class :character   1st Qu.:12082   Class :character   1st Qu.:1   
+##  Mode  :character   Median :26112   Mode  :character   Median :1   
+##                     Mean   :26833                      Mean   :1   
+##                     3rd Qu.:39123                      3rd Qu.:1   
+##                     Max.   :55079                      Max.   :1   
+##  POPGROUP.display.label RacesReported         HSDegree       BachDegree   
+##  Length:136             Min.   :  500292   Min.   :62.20   Min.   :15.40  
+##  Class :character       1st Qu.:  631380   1st Qu.:85.50   1st Qu.:29.65  
+##  Mode  :character       Median :  832708   Median :88.70   Median :34.10  
+##                         Mean   : 1144401   Mean   :87.63   Mean   :35.46  
+##                         3rd Qu.: 1216862   3rd Qu.:90.75   3rd Qu.:42.08  
+##                         Max.   :10116705   Max.   :95.50   Max.   :60.30
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#Looking at the sample data for HSDegree with the summary() function, it already seems like most of the data}
+\CommentTok{\#points lie at the higher end of the percentage spectrum (closer to 100\%) than the rest of the data.}
+\CommentTok{\#The mean value is 87.63, and the IQR goes from 85.5 {-} 90.75, which is where the majority of the values lie between.}
+\CommentTok{\#Given that this range is quite small, I would say that the normal distribution cannot be accurately used as a model}
+\CommentTok{\#for this data, since the sample data is already not normally distrubted, and is already showed skewness.}
+
+\CommentTok{\#The data distribution, according to the histogram, is unimodal. There is really only one peak}
+\CommentTok{\#or mode in the distribution of the HSDegree variable. }
+\CommentTok{\#However, the distribution is not approximately symmetrical, bell{-}shaped or normal. }
+\CommentTok{\#It is negatively skewed (to the left).}
+\NormalTok{x }\OtherTok{\textless{}{-}}\NormalTok{ community\_df}\SpecialCharTok{$}\NormalTok{HSDegree}
+\CommentTok{\#Histogram oof HSDegree variable}
+\NormalTok{hist.HSDegree }\OtherTok{\textless{}{-}} \FunctionTok{ggplot}\NormalTok{(community\_df,}\FunctionTok{aes}\NormalTok{(HSDegree)) }\SpecialCharTok{+} \FunctionTok{geom\_histogram}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{y=}\NormalTok{..density..),}\AttributeTok{bins=}\DecValTok{11}\NormalTok{,}\AttributeTok{colour=}\StringTok{"black"}\NormalTok{,}\AttributeTok{fill=}\StringTok{"white"}\NormalTok{) }\SpecialCharTok{+} \FunctionTok{labs}\NormalTok{(}\AttributeTok{x=}\StringTok{"Percentage of Total City Population with HSDegrees"}\NormalTok{,}\AttributeTok{y=}\StringTok{"Density"}\NormalTok{)}
+\NormalTok{hist.HSDegree}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{exercise_0302_PhillipsEmily_files/figure-latex/unnamed-chunk-1-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#overlaying normal curve}
+\NormalTok{hist.HSDegree }\SpecialCharTok{+} \FunctionTok{stat\_function}\NormalTok{(}\AttributeTok{fun=}\NormalTok{dnorm,}\AttributeTok{args=}\FunctionTok{list}\NormalTok{(}\AttributeTok{mean=}\FunctionTok{mean}\NormalTok{(x),}\AttributeTok{sd=}\FunctionTok{sd}\NormalTok{(x)),}\AttributeTok{colour=}\StringTok{"black"}\NormalTok{,}\AttributeTok{size=}\DecValTok{1}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{exercise_0302_PhillipsEmily_files/figure-latex/unnamed-chunk-1-2.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#Create a Probability Plot of the HSDegree variable.}
+\CommentTok{\#ggplot(community\_df, aes(sample=HSDegree))+stat\_qq()}
+\CommentTok{\#Construction a normal probability plot}
+\CommentTok{\#Can evaluate how close the points on the probability plot fall to the normal line}
+\CommentTok{\# qqnorm(community\_df$HSDegree)}
+\NormalTok{qqplot.HSDegree }\OtherTok{\textless{}{-}} \FunctionTok{qplot}\NormalTok{(}\AttributeTok{sample=}\NormalTok{community\_df}\SpecialCharTok{$}\NormalTok{HSDegree,}\AttributeTok{stat=}\StringTok{\textquotesingle{}qq\textquotesingle{}}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning: `stat` is deprecated
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{qqplot.HSDegree}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{exercise_0302_PhillipsEmily_files/figure-latex/unnamed-chunk-1-3.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Based on what you see in this probability plot, is the distribution approximately normal? Explain how you know.}
+\CommentTok{\# If not normal, is the distribution skewed? If so, in which direction? Explain how you know.}
+
+\CommentTok{\#For analyzing the probability plot for the data distribution of HSDegree, I notice that most of the data points}
+\CommentTok{\#do not follow along the normal line. It has a general curve to it and a majority of the points outside of majority range}
+\CommentTok{\#fall away from the line and move away from the normality of the distribution. }
+
+\CommentTok{\#The distribution is skewed to the left, as both ends of the normality plot bend below the hypothetical normal line that was drawn on the plot.}
+
+\CommentTok{\#stat.desc() function}
+\CommentTok{\#install.packages("pastecs")}
+\FunctionTok{library}\NormalTok{(pastecs)}
+\FunctionTok{stat.desc}\NormalTok{(community\_df}\SpecialCharTok{$}\NormalTok{HSDegree,}\AttributeTok{norm=}\ConstantTok{TRUE}\NormalTok{,}\AttributeTok{p=}\FloatTok{0.95}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##       nbr.val      nbr.null        nbr.na           min           max 
+##  1.360000e+02  0.000000e+00  0.000000e+00  6.220000e+01  9.550000e+01 
+##         range           sum        median          mean       SE.mean 
+##  3.330000e+01  1.191800e+04  8.870000e+01  8.763235e+01  4.388598e-01 
+##  CI.mean.0.95           var       std.dev      coef.var      skewness 
+##  8.679296e-01  2.619332e+01  5.117941e+00  5.840241e-02 -1.674767e+00 
+##      skew.2SE      kurtosis      kurt.2SE    normtest.W    normtest.p 
+## -4.030254e+00  4.352856e+00  5.273885e+00  8.773635e-01  3.193634e-09
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# In several sentences provide an explanation of the result produced for skew, kurtosis, and z{-}scores. }
+\CommentTok{\# In addition, explain how a change in the sample size may change your explanation?}
+
+\CommentTok{\#The negative skewness value of the HSDegree variable indicates that the data distribution is skewed to the left. With}
+\CommentTok{\#a value of {-}1.67, we can see that the skew is pretty strongly directed to the left for this series.}
+\CommentTok{\#A normal distribution has a kurtosis of exactly 3. The kurtosis for this data distribution is equal to 4.35,}
+\CommentTok{\#which being greater than 3, shows that it is platykurtic, which shows that the tails are shorter and thinner}
+\CommentTok{\#and the peak is lower and broader as we did see with the histogram. }
+\CommentTok{\#The normtest.p value is 3.19364e{-}09, which is less than p = 0.05 for a 95\% confidence interval.}
+\CommentTok{\#This demonstrates that the distribution of data is significantly from the normal distribution, so we can assume}
+\CommentTok{\#that the data distribution of HSDegree is not normal. This comes from the Shapiro{-}Wilk test of normality.}
+
+\CommentTok{\#The sample size of 136 was relatively small for a population representation of the United States, especially}
+\CommentTok{\#when it comes from Census Bureaue data. If the sample size was different, it may have changed my explanation}
+\CommentTok{\#as the distribution would be more representative of the country and give a better idea of the distribution. }
+\end{Highlighting}
+\end{Shaded}
+
+
+\end{document}
