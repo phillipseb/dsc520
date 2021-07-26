@@ -31,8 +31,14 @@ Also, for a negative covariance example, TimeReading and TimeTV have a relativel
 ## Examine the Survey variables
 
 ```{r measurements, echo=FALSE}
+
+print("Before TimeTV conversion")
+summary(student_survey)
+
 #Conversion of 'TimeTV' minutes into hours by dividing by 60
 student_survey['TimeTV'] <- student_survey['TimeTV']/60
+
+print("After TimeTV conversion")
 
 summary(student_survey)
 
@@ -42,13 +48,13 @@ I am assuming that each record in the dataset represents a weekly amount of hour
 
 Measurements:
 - TimeReading: hours spent reading
-- TimeTV: hours spent watching TV
+- TimeTV: originally minutes spent watching TV, converted to hours by dividing by 60
 - Happiness: percentage score of one's happiness
 - Gender: binary value for gender (0 or 1)
 
-Luckily, in terms of the time variables from this dataset, they seem to both be in hours of measurement. However, happiness is given as a score out of 100, which does not really have an unit of measurement.Therefore, if we want to assess the covariance between any of the time variables and happiness, it would be difficult to compare in an objective way since the measures are not standardized. 
+For the time variables, they are using different units of measurement, with TimeReading being in hours and TimeTV being in minutes. I converted TimeTV to hours as well by dividing by 60 for the calculation purposes. Happiness is given as a score out of 100, which does not really have an unit of measurement.Therefore, if we want to assess the covariance between any of the time variables and happiness, it would be difficult to compare in an objective way since the measures are not standardized. 
 
-If we changed the measurements of our variables, we would not be able to compare the covariance values among the variables. Everything would have to be the measured in the same units to allow for this accurate comparison. Since it seems like both Time variables are measured in hours, it might not be a huge problem, since our question pertains to these variables and they are being measured in the same units. However, if we want to do any comparisons with the time variables and happiness, the comparison will not be objective, since the datasets have different units. 
+If we changed the measurements of our variables, we would not be able to compare the covariance values among the variables. Everything would have to be the measured in the same units to allow for this accurate comparison. If we want to do any comparisons with the time variables and happiness, the comparison will not be objective, since the datasets have different units. Therefore, I converted both time variables to be in hours measurement to allow for more objective comparisons.
 
 ## Type of correlation to perform
 
