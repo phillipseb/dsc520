@@ -31,6 +31,9 @@ Also, for a negative covariance example, TimeReading and TimeTV have a relativel
 ## Examine the Survey variables
 
 ```{r measurements, echo=FALSE}
+#Conversion of 'TimeTV' minutes into hours by dividing by 60
+student_survey['TimeTV'] <- student_survey['TimeTV']/60
+
 summary(student_survey)
 
 head(student_survey)
