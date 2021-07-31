@@ -1,0 +1,226 @@
+---
+title: "assignment_exercise0802_PhillipsEmily"
+author: "Emily Phillips"
+date: "7/30/2021"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(car)
+library(QuantPsyc)
+library(boot)
+```
+
+## R Markdown
+
+```{r housing, echo=FALSE}
+## Load the Housing dataset
+housing_df <- read_excel("C:/Users/phill/OneDrive/Desktop/dsc520/completed/assignment04/week-6-housing.xlsx")
+```
+
+
+```{r stats, echo=FALSE}
+#Exploring the housing dataset
+str(housing_df)
+summary(housing_df)
+head(housing_df)
+```
+
+```{r clean, echo=FALSE}
+## Converting numerical categorical columns to factors
+housing_df$sale_reason <- factor(housing_df$sale_reason)
+
+housing_df$sale_instrument <- factor(housing_df$sale_instrument)
+
+housing_df$building_grade <- factor(housing_df$building_grade)
+
+housing_df$zip5 <- factor(housing_df$zip5)
+```
+
+```{r missing, echo=FALSE}
+#Handling any NA values, mostly in ctyname
+#sale_warning
+#ctyname
+sum(is.na(housing_df$sale_warning))
+
+sum(is.na(housing_df$ctyname))
+
+#Take out NA citynames
+housing_df$ctyname[is.na(housing_df$ctyname)] <- 'Not Stated'
+
+#Handling NA sale_warning, 0 if does not exist
+housing_df$sale_warning[is.na(housing_df$sale_warning)] <- 0
+```
+
+```{r clean2, echo=FALSE}
+#Renaming quoted columns
+housing_df <- housing_df %>% dplyr::rename(
+  sale_date = 'Sale Date',
+  sale_price = 'Sale Price'
+)
+```
+
+### 1. Explain any transformations or modifications you made to the dataset
+- From first using this dataset, I found that there were categorical variables which were labeled as being of type 'numeric'. Since I wanted the categories to be recognized, I converted these variables into factors to allow that sort of manipulation and typing. These variables are: sale_reason, sale_instrument and building_grade.
+- Also, there were NA values in two of the columns, sale_warning and ctyname. In order to remove these, I set default values in both of the fields. 
+- I also renamed the 'Sale Date' & 'Sale Price' columns, so they wouldn't require the use of quotes when referencing. 
+
+### 2. Create two variables; one that will contain the variables Sale Price and Square Foot of Lot (same variables used from previous assignment on simple regression) and one that will contain Sale Price and several additional predictors of your choice. Explain the basis for your additional predictor selections.
+
+```{r vars, echo=FALSE}
+var1 <- sale_price ~ sq_ft_lot
+var2 <- sale_price ~ sq_ft_lot + bedrooms + bath_full_count + bath_half_count + year_built
+```
+
+The additional predictors I selected are: zip5, bedrooms, bath_full_count, bath_half_count and year_built. Using personal experience, location, age of the house and number of rooms is critical for determining the sales price of a house. These are factors that most prospective renters/buyers ask about when looking at places, and definitely play a role at determining the value of the property. This value is usually conveyed through sales price.
+
+### 3. Execute a summary() function on two variables defined in the previous step to compare the model results. What are the R2 and Adjusted R2 statistics? Explain what these results tell you about the overall model. Did the inclusion of the additional predictors help explain any large variations found in Sale Price?
+
+```{r model, echo=FALSE}
+housing.1 <- lm(var1, data=housing_df)
+housing.2 <- lm(var2, data=housing_df)
+
+summary(housing.1)
+summary(housing.2)
+```
+
+- Model 1: 
+   - R2: 0.01435, Square feet of the lot accounts for 1.435% of the variation in sales price. 
+   - Adjusted R-squared: 0.01428, Difference from R2 is 0.00007 (very small), if the model were derived from the population rather than a sample, it would account for approx. 0,007% less variance in the outcome.
+
+- Model 2:
+   - R2: 0.1464, If Square feet of the lot accounts for 1.435%, the other predictors account for an additional 10% of the variation in sales price, which is much more than just square feet by itself.
+   - Adjusted R-squared: 0.1461, Difference from R2 is 0.0003, if the model were derived from the population rather than the sample, it would account for approx. 0.03% less variance in the outcome.
+   
+The inclusion of the additional predictors helped explain an additional 10% of the variation in sales price, which is quite a jump from the 1.435% that was only explained by square feet of the lot.
+
+### 4. Considering the parameters of the multiple regression model you have created. What are the standardized betas for each parameter and what do the values indicate?
+
+```{r beta, echo=FALSE}
+lm.beta(housing.2)
+
+sd(housing_df$sale_price)
+```
+These estimates tell us the number of standard deviations by which the outcome will change as a result of one standard deviation change in the predictor. 
+
+sq_ft_lot (.129): this value indicates that as the square feet of the lot increases by one standard deviation, sales prices increases by .129 standard deviations. The standard deviation for sales price is 404,381, and so this constitutes a change of 52,165 (404381*.129) dollars. 
+
+bedrooms (.166): this value indicates that as the number of bedrooms in the house increases by one standard deviation, sales price increases by .166 standard deviations. This constitutes a change of $67,127 dollars. 
+
+
+### 5. Calculate the confidence intervals for the parameters in your model and explain what the results indicate.
+
+```{r confint, echo=FALSE}
+confint(housing.2)
+```
+For this model, there are no predictors which have zero in their confidence intervals, which is an indicator that the model is not extremely poor in its predictions.
+
+sq_ft_lot and year_built seem to have the tighest confidence intervals, indicating that the estimates for the current model are likely to be representative of the true population values. 
+
+The interval for the other variables are a bit wider, indicating that the parameter is less representative. 
+
+### 6. Assess the improvement of the new model compared to your original model (simple regression model) by testing whether this change is significant by performing an analysis of variance.
+
+```{r compare, echo=FALSE}
+anova(housing.1,housing.2)
+```
+
+Value of F is 497.28. The p-value for F is very small, 2.2e-16, which is definitely statistically significant given its magnitude.
+
+From this assessment, the new model significantly improved the fit of the model to the data compared to the simple regression model with just sq_ft_lot. 
+
+
+### 7. Perform casewise diagnostics to identify outliers and/or influential cases, storing each function's output in a dataframe assigned to a unique variable name.
+
+```{r casewise, echo=FALSE}
+housing_df$standardized.residuals <- rstandard(housing.2)
+housing_df$studentized.residuals <- rstudent(housing.2)
+housing_df$cooks.distance <- cooks.distance(housing.2)
+housing_df$dfbeta <- dfbeta(housing.2)
+housing_df$dffit <- dffits(housing.2)
+housing_df$leverage <- hatvalues(housing.2)
+housing_df$covariance.ratios <- covratio(housing.2)
+```
+
+
+```{r select, echo=FALSE}
+housing_df %>% dplyr::select(standardized.residuals,studentized.residuals,cooks.distance,dfbeta,dffit,leverage,covariance.ratios)
+head(housing_df)
+```
+
+```{r standard, echo=FALSE}
+housing_df$large.residual <- housing_df$standardized.residuals > 2 | housing_df$standardized.residuals < -2
+sum(housing_df$large.residual)
+
+housing_df[housing_df$large.residual,c("sale_date","sale_price","sq_ft_lot","bedrooms","standardized.residuals")]
+```
+345 cases had a large residual. We would expect about 643 cases (5% of 12865) to have standardized residuals outside of the limits from -2 to 2. Therefore, our sample was underneath what we expected to be outside of the limits!
+
+However, there are quite a few residuals with values further away from 2 and -2. For example, there is one case with a standarized residual of ~8, which could be a case that we need to do more analysis on.
+
+Case 341 has a standardized residual of 8.21 which is concerningly above the upper bound of 2. 
+
+```{r casewise, echo=FALSE}
+housing_df[housing_df$large.residual,c("cooks.distance","leverage","covariance.ratios")]
+```
+- No Cook's distance values greater than 1, no undue influence on the model
+- Average leverage = 5 + 1/12865 =0.0005
+  - Looking for values either twice as large as this (0.001) or three times as large (0.0015)
+  - Case 9 has a leverage quite larger than both limits
+  - Case 17 is higher than the limit
+  - There are quite a few other cases with leverage amounts greater than the average limits, may need to investigate further
+
+- .9986 > CVR > 1.0014 
+ - Most of the values are right around these limits, but there are some which fall below and above. 
+   - Case 9 has a covariance ratio greater than 1.0014 by ~.1
+   - Case 17 is just slightly above the upper bound for covariance ratio, ~.007
+   - Case 341 has a covariance ratio below the specified lower bound by ~.03, but its cook distance and leverage values are OK.
+   
+### Perform the necessary calculations to assess the assumption of independence and state if the condition is met or not.
+```{r independent, echo=FALSE}
+dwt(housing.2)
+```
+ 
+Testing the assumption of independent errors using the Durbin-Watson test
+
+Our D-W Statistic is 0.705, which is less than 1 and could definitely raise some alarm bells according to the book author. In this case, we could state that the assumption of independence has not been met. Also, with the p-value equal to 0 which is less than 0.05, we could say that this contradiction of the assumption is statistically significant. 
+
+### Perform the necessary calculations to assess the assumption of no multicollinearity and state if the condition is met or not. VIF & tolerance statistics
+
+```{r vif, echo=FALSE}
+print("VIF")
+vif(housing.2)
+
+#tolerance
+print("TOLERANCE")
+1/vif(housing.2)
+
+#average VIF
+print("AVERAGE VIF")
+mean(vif(housing.2))
+```
+- The largest VIF is not greater than 10, so we are good there!
+- The average VIG is just slightly greater than 1 by ~.2, so I wouldn't say it is substantial enough to bias the regression.
+- All tolerances are greater than 0.1 and 0.2 
+
+Therefore with these measures, I would conclude that there is no collinearity within this housing data. 
+
+### Visually check the assumptions related to the residuals using the plot() and hist() functions. Summarize what each graph is informing you of and if any anomalies are present.
+
+```{r plots, echo=FALSE}
+plot(housing.2)
+```
+From looking at the plot of fitted values against residuals, I can see some clear funneling out on the graph. This increases the chances that there is heteroscedasticity in the data. 
+
+For the Q-Q Plot, the points quite obviously deviate from the line, expressing non-normality for the distribution of the data. There is skew.
+
+```{r hist, echo=FALSE}
+hist(housing_df$studentized.residuals)
+```
+The histogram of the studentized residuals shows a left skew to the data, more points at the lower end of the scale. There's also some outliers in the plot, which should probably be investigated. 
+
+### Overall, is this regression model unbiased? If an unbiased regression model, what does this tell us about the sample vs. the entire population model?
+
+From all of these assessments, I would conclude that the model does not appear to be both accurate for the sample and generalizable to the population. The regression model does not appear to be unbiased unfortunately. We may need to assess our predictors further, and see how we 
