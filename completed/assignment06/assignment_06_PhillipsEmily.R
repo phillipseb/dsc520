@@ -3,7 +3,7 @@
 # Date: 2021-07-29
 
 ## Set the working directory to the root of your DSC 520 directory
-setwd("C:/Users/holmk/OneDrive/Desktop/DSC520 - Statistics/personalRepo/dsc520/")
+setwd("C:/Users/phill/OneDrive/Desktop/dsc520/")
 
 ## Load the `data/r4ds/heights.csv` to
 heights_df <- read.csv("data/r4ds/heights.csv")
@@ -39,7 +39,8 @@ sse <- sum(residuals^2)
 r_squared <- ssm/sst
 
 ## Number of observations
-n <- 1192
+#n <- 1192
+n <- nrow(heights_df)
 ## Number of regression parameters
 p <- 2
 ## Corrected Degrees of Freedom for Model (p-1)
@@ -63,3 +64,4 @@ adjusted_r_squared <- 1-(1-r_squared)*(n-1) / (n-p)
 
 ## Calculate the p-value from the F distribution
 p_value <- pf(f_score, dfm, dft, lower.tail=F)
+

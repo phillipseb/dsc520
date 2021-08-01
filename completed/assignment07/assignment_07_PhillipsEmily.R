@@ -3,7 +3,7 @@
 # Date: 2021-07-29
 
 ## Set the working directory to the root of your DSC 520 directory
-setwd("C:/Users/holmk/OneDrive/Desktop/DSC520 - Statistics/personalRepo/dsc520/")
+setwd("C:/Users/phill/OneDrive/Desktop/dsc520/")
 
 ## Load the `data/r4ds/heights.csv` to
 heights_df <- read.csv("data/r4ds/heights.csv")
@@ -34,7 +34,7 @@ sse <- sum(residuals^2)
 r_squared <- ssm/sst
 
 ## Number of observations
-n <- 1192
+n <- nrow(heights_df)
 ## Number of regression paramaters
 p <- 8
 ## Corrected Degrees of Freedom for Model
