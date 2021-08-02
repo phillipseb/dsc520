@@ -7,10 +7,12 @@ output: pdf_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(readxl)
 library(tidyverse)
 library(car)
 library(QuantPsyc)
 library(boot)
+library(GGally)
 ```
 
 ## R Markdown
@@ -21,14 +23,14 @@ housing_df <- read_excel("C:/Users/phill/OneDrive/Desktop/dsc520/completed/assig
 ```
 
 
-```{r stats, echo=FALSE}
+```{r stats}
 #Exploring the housing dataset
 str(housing_df)
 summary(housing_df)
 head(housing_df)
 ```
 
-```{r clean, echo=FALSE}
+```{r clean}
 ## Converting numerical categorical columns to factors
 housing_df$sale_reason <- factor(housing_df$sale_reason)
 
@@ -39,7 +41,7 @@ housing_df$building_grade <- factor(housing_df$building_grade)
 housing_df$zip5 <- factor(housing_df$zip5)
 ```
 
-```{r missing, echo=FALSE}
+```{r missing}
 #Handling any NA values, mostly in ctyname
 #sale_warning
 #ctyname
@@ -67,6 +69,14 @@ housing_df <- housing_df %>% dplyr::rename(
 - Also, there were NA values in two of the columns, sale_warning and ctyname. In order to remove these, I set default values in both of the fields. 
 - I also renamed the 'Sale Date' & 'Sale Price' columns, so they wouldn't require the use of quotes when referencing. 
 
+```{r corr, echo=FALSE}
+# Check correlations (as scatterplots), distribution and print corrleation coefficient 
+ggpairs(housing_df, columns = c(2,15,16,17,19,22),title="correlogram with ggpairs()") 
+```
+Highest positive correlation with sales_price --> bath_full_count with 0.285
+
+Lowest correlation --> sq_ft_lot with 0.120
+
 ### 2. Create two variables; one that will contain the variables Sale Price and Square Foot of Lot (same variables used from previous assignment on simple regression) and one that will contain Sale Price and several additional predictors of your choice. Explain the basis for your additional predictor selections.
 
 ```{r vars, echo=FALSE}
@@ -74,11 +84,11 @@ var1 <- sale_price ~ sq_ft_lot
 var2 <- sale_price ~ sq_ft_lot + bedrooms + bath_full_count + bath_half_count + year_built
 ```
 
-The additional predictors I selected are: zip5, bedrooms, bath_full_count, bath_half_count and year_built. Using personal experience, location, age of the house and number of rooms is critical for determining the sales price of a house. These are factors that most prospective renters/buyers ask about when looking at places, and definitely play a role at determining the value of the property. This value is usually conveyed through sales price.
+The additional predictors I selected (apart from sq_ft_lot) are: bedrooms, bath_full_count, bath_half_count and year_built. Using personal experience, location, age of the house and number of rooms is critical for determining the sales price of a house. These are factors that most prospective renters/buyers ask about when looking at places, and definitely play a role at determining the value of the property. This value is usually conveyed through sales price.
 
 ### 3. Execute a summary() function on two variables defined in the previous step to compare the model results. What are the R2 and Adjusted R2 statistics? Explain what these results tell you about the overall model. Did the inclusion of the additional predictors help explain any large variations found in Sale Price?
 
-```{r model, echo=FALSE}
+```{r model}
 housing.1 <- lm(var1, data=housing_df)
 housing.2 <- lm(var2, data=housing_df)
 
@@ -101,13 +111,16 @@ The inclusion of the additional predictors helped explain an additional 10% of t
 ```{r beta, echo=FALSE}
 lm.beta(housing.2)
 
+print("Standard deviation of sales price")
 sd(housing_df$sale_price)
 ```
 These estimates tell us the number of standard deviations by which the outcome will change as a result of one standard deviation change in the predictor. 
 
-sq_ft_lot (.129): this value indicates that as the square feet of the lot increases by one standard deviation, sales prices increases by .129 standard deviations. The standard deviation for sales price is 404,381, and so this constitutes a change of 52,165 (404381*.129) dollars. 
+Examples:
 
-bedrooms (.166): this value indicates that as the number of bedrooms in the house increases by one standard deviation, sales price increases by .166 standard deviations. This constitutes a change of $67,127 dollars. 
+- sq_ft_lot (.129): this value indicates that as the square feet of the lot increases by one standard deviation, sales prices increases by .129 standard deviations. The standard deviation for sales price is 404,381, and so this constitutes a change of 52,165 (404381*.129) dollars. 
+
+- bedrooms (.166): this value indicates that as the number of bedrooms in the house increases by one standard deviation, sales price increases by .166 standard deviations. This constitutes a change of $67,127 dollars. 
 
 
 ### 5. Calculate the confidence intervals for the parameters in your model and explain what the results indicate.
@@ -134,7 +147,7 @@ From this assessment, the new model significantly improved the fit of the model 
 
 ### 7. Perform casewise diagnostics to identify outliers and/or influential cases, storing each function's output in a dataframe assigned to a unique variable name.
 
-```{r casewise, echo=FALSE}
+```{r casewise}
 housing_df$standardized.residuals <- rstandard(housing.2)
 housing_df$studentized.residuals <- rstudent(housing.2)
 housing_df$cooks.distance <- cooks.distance(housing.2)
@@ -145,12 +158,12 @@ housing_df$covariance.ratios <- covratio(housing.2)
 ```
 
 
-```{r select, echo=FALSE}
+```{r select}
 housing_df %>% dplyr::select(standardized.residuals,studentized.residuals,cooks.distance,dfbeta,dffit,leverage,covariance.ratios)
 head(housing_df)
 ```
 
-```{r standard, echo=FALSE}
+```{r standard}
 housing_df$large.residual <- housing_df$standardized.residuals > 2 | housing_df$standardized.residuals < -2
 sum(housing_df$large.residual)
 
@@ -162,7 +175,7 @@ However, there are quite a few residuals with values further away from 2 and -2.
 
 Case 341 has a standardized residual of 8.21 which is concerningly above the upper bound of 2. 
 
-```{r casewise, echo=FALSE}
+```{r casewise2, echo=FALSE}
 housing_df[housing_df$large.residual,c("cooks.distance","leverage","covariance.ratios")]
 ```
 - No Cook's distance values greater than 1, no undue influence on the model
