@@ -1,0 +1,84 @@
+---
+title: "thoracic_logistic_exercise_PhillipsEmily"
+author: "Emily Phillips"
+date: "8/3/2021"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(car)
+library(mlogit)
+```
+
+# Number 1
+## Reading in the Thoracic Surgey CSV file
+
+```{r data, echo=FALSE}
+thoracic_df <- read.csv("thoracic_surgery.csv")
+head(thoracic_df)
+```
+
+### Fit a binary logistic regression model to the data set that predicts whether or not the patient survived for one year (the Risk1Y variable) after the surgery. Use the glm() function to perform the logistic regression. See Generalized Linear Models for an example. Include a summary using the summary() function in your results.
+
+```{r logistic}
+
+#FALSE will be taken as the intial baseline which is good because this represents that the individual did not make it past the
+#one-year survival period
+#Therefore, our model coefficients will reflect the probability of surviving rather than the probability of not surviving
+
+thoracicModel.1 <- glm(Risk1Yr ~ ï..DGN + PRE4 + PRE5 + PRE6 + PRE7 + PRE8 + PRE9 + PRE10 + PRE11 + PRE14 + PRE17 + PRE19 + PRE25 + PRE30 + PRE32 + AGE, data = thoracic_df,family = binomial())
+summary(thoracicModel.1)
+```
+
+### According to the summary, which variables had the greatest effect on the survival rate?
+
+The variables that had the greatest effect on the survival rate can be found by assessing whether their z-statistic was significant at less than p = 0.05. 
+For this model, those variables are the following: PRE9TRUE, PRE14OC14, PRE17TRUE, PRE30TRUE. 
+
+### To compute the accuracy of your model, use the dataset to predict the outcome variable. The percent of correct predictions is the accuracy of your model. What is the accuracy of your model?
+
+```{r accuracy}
+#Find probability for each observation
+thoracic_df$model_prob <- predict(thoracicModel.1, thoracic_df, type = "response")
+
+#Transform the probabilities into success & failures, 1s & 0s
+#risk_binary turns "TRUE" into 1 and "FALSE" into 0
+thoracic_df <- thoracic_df  %>% mutate(model_pred = 1*(model_prob > .53) + 0,
+                                 risk_binary = 1*(Risk1Yr == "TRUE") + 0)
+
+#Calculate the accuracy of the model, compare model_pred and risk_binary
+thoracic_df <- thoracic_df %>% mutate(accurate = 1*(model_pred == risk_binary))
+sum(thoracic_df$accurate)/nrow(thoracic_df)
+```
+
+The accuracy of our model is 83.6%, which is the percent of correct predictions that came from our model for the Risk1Yr outcome variable.
+
+# Number 2
+The label variable is either 0 or 1 and is the output we want to predict using the x and y variables.
+```{r data2, echo=FALSE}
+binary_df <- read.csv("http://content.bellevue.edu/cst/dsc/520/id/resources/binary-classifier-data.csv")
+head(binary_df)
+```
+
+### Fit a logistic regression model to the binary-classifier-data.csv dataset
+```{r logistic2}
+
+binaryModel.1 <- glm(label ~ x + y, data = binary_df,family = binomial())
+summary(binaryModel.1)
+```
+### What is the accuracy of the logistic regression classifier?
+```{r accuracy2}
+#Find probability for each observation
+binary_df$model_prob <- predict(binaryModel.1, binary_df, type = "response")
+
+#Transform the probabilities into success & failures, 1s & 0s
+#risk_binary turns "TRUE" into 1 and "FALSE" into 0
+binary_df <- binary_df  %>% mutate(model_pred = 1*(model_prob > .53) + 0,
+                                 label_binary = 1*(label == 1) + 0)
+
+#Calculate the accuracy of the model, compare model_pred and risk_binary
+binary_df <- binary_df %>% mutate(accurate = 1*(model_pred == label_binary))
+sum(binary_df$accurate)/nrow(binary_df)
+```
+The accuracy of the logistic regression classifier is 47.1%. 

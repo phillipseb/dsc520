@@ -13,7 +13,7 @@ knitr::opts_chunk$set(echo = TRUE)
 The idea and question of fertility has been a topic that I have been researching for some years now, especially being a young woman. It has become more of a prevalent issue, at least in the United States, for women to struggle with infertility and therefore not being able to have children naturally or maybe at all. In terms of birth rates, I would think that the issue of reproductive health in women (and maybe even men) has an impact on the number of kids that are born year-to-year in the country. Therefore, the problem that I want to research is the problem of infertility in America and how it has impacted birth rate. In order for any country's population to grow, people need to be born, and it could have a huge impact on the population if people experience issues with fertility and reproductive health. With the concept of infertility, I would also like to research how various factors influence one's fertility and whether we can predict the fertility of an individual based on their demographic and environmental variables.
 
 ### Research questions
-1. What is the weight of men and women's reproductive health in influencing a couple's ability to have children?
+1. What is the weight of women's reproductive health in influencing a couple's ability to have children?
 2. What is the current difference in birth rates from one country to another?
 3. What is the average age for women to try to start having children?
 4. How have non-traditional methods of having children influenced birth rate, such as adoption/IVF/etc?
@@ -48,7 +48,6 @@ In terms of partiality, I think it will be difficult to address this problem at 
 - 264 rows in each CSV file
 3. [Female Respondent Data File](https://www.cdc.gov/nchs/data_access/ftp_dua.htm?url_redirect=ftp://ftp.cdc.gov/pub/Health_Statistics/NCHS/Datasets/NSFG)
 4. [Female Pregnancy Data File](https://www.cdc.gov/nchs/data_access/ftp_dua.htm?url_redirect=ftp://ftp.cdc.gov/pub/Health_Statistics/NCHS/Datasets/NSFG)
-5. [Male Respondent Data File](https://www.cdc.gov/nchs/data_access/ftp_dua.htm?url_redirect=ftp://ftp.cdc.gov/pub/Health_Statistics/NCHS/Datasets/NSFG)
 - All three above datasets:
   - [Original source: National Survey of Family Growth](https://www.cdc.gov/nchs/nsfg/nsfg_2017_2019_puf.htm)
   - Collected from 2017-2019
@@ -91,3 +90,197 @@ In terms of partiality, I think it will be difficult to address this problem at 
 - Assessing categorical variables when used in regression
 - Generalization of analysis on one region to the greater regions -- EX) USA to the world
 - Merging of datasets, especially when bringing in data on men & women
+
+### How to import and clean my data
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(car)
+library(mlogit)
+library(Hmisc)
+```
+
+```{r fertility, echo=FALSE}
+fertility_df <- read.csv("fertility.csv")
+head(fertility_df)
+```
+
+```{r world bank, echo=FALSE}
+fertility__rate_df <- read.csv("fertility_rate.csv")
+country_pop_df <- read.csv("country_population.csv")
+```
+
+```{r NSFG, echo=FALSE}
+preg <- read.csv("2015_2017_FemPregData.csv")
+fem_resp <- read.csv("2015_2017_FemRespData.csv")
+
+str(preg)
+```
+
+```{r NA vals fert, echo=FALSE}
+sapply(fertility_df, function(x) sum(is.na(x)))
+```
+No NA values in any of the columns in the 1st fertility dataset.
+
+
+```{r NA vals rate, echo=FALSE}
+sapply(fertility__rate_df, function(x) sum(is.na(x)))
+```
+```{r NA vals pop, echo=FALSE}
+sapply(country_pop_df, function(x) sum(is.na(x)))
+```
+I am removing Indicator.Name & Indicator.Code from both fertility_rate_df & country_pop_df because these columns have the same values for each row and don't give any extra information around the datasets and their specifications. 
+
+For the columns in fertility_rate_df that represent the years from 1960-2016, there are ~18-30 NAs in each of the columns. I think this dataset could be cleaned up depending on the number of years that I really wanted to investigate and analyze. 56 years of data is nice to have, but I think it is a bit excessive if we could rather try to find a yearly trend from a subset of the dataset.
+
+The country_pop_df dataset does not have as many NA values in the year columns as the fertility_rate_df. However, if I subset the fertility_rate_df dataset than I will subset the population one by the same columns to keep it consistent and better for analyzing the same years among the countries. 
+
+I am also going to replace the NAs in the rest of the year columns 1980-2016 with the median value for the year column. I chose median over mean, since I don't want the value to be affected by the extreme values and countries have highly varying population sizes so the fertility rates and population numbers will be quite different. 
+
+
+```{r subset years, echo=FALSE}
+# exclude variables v1, v2, v3
+cols <- names(fertility__rate_df) %in% c("Indicator.Name","Indicator.Code","X1960", "X1961", "X1962","X1963","X1964","X1965","X1966","X1967","X1968","X1969","X1970","X1971","X1972","X1973","X1974","X1975","X1976","X1977","X1978","X1979")
+cols2 <- names(country_pop_df) %in% c("Indicator.Name","Indicator.Code","X1960", "X1961", "X1962","X1963","X1964","X1965","X1966","X1967","X1968","X1969","X1970","X1971","X1972","X1973","X1974","X1975","X1976","X1977","X1978","X1979")
+
+fertility__rate_df<- fertility__rate_df[!cols]
+
+country_pop_df <- country_pop_df[!cols2]
+```
+
+```{r subset years, echo=FALSE}
+fertility__rate_df[,5:41] <- impute(fertility__rate_df[,3:39], fun = median)
+
+country_pop_df[,5:41] <- impute(country_pop_df[,3:39], fun = median)
+```
+
+```{r NA vals preg, echo=FALSE}
+colSums(is.na(preg))
+preg[,colSums(is.na(preg)) >0]
+```
+148 of the 380 variables contained NA values. The NA counts range from a couple hundred to ~5500 which is basically the number of rows in the dataset as is row (numRows = 5554). Given that there are already a great amount of columns in this dataset, I decided to remove all of the columns with any NA values since I think the rest of the data is already representative of the females that were surveyed about their pregnancies. 
+
+```{r NA vals remove preg, echo=FALSE}
+preg <- preg[ , colSums(is.na(preg)) == 0]
+```
+
+```{r NA vals resp, echo=FALSE}
+colSums(is.na(fem_resp))
+fem_resp[,colSums(is.na(fem_resp)) >0]
+```
+2,792 of the 3,024 total variables in the female resp dataset have NA values. The count of these NA values is mostly very high such as being around 5,554 which is the total number of rows in the dataset as is, which would mean that the entire column contains NAs. Given that this dataset already has many columns and many are not applicable to my problem/question, I am going to remove all columns with any NA values to make the dataset easier to consume, analyze and utilize. 
+
+```{r NA vals remove resp, echo=FALSE}
+fem_resp <- fem_resp[ , colSums(is.na(fem_resp)) == 0]
+```
+
+#### Merging of similar datasets
+
+I want to merge the fertility_rate_df & country_pop_df datasets on country code, given that both datasets provide data on the same countries over the 36 years from 1980 - 2016. I took out the year variables from 1960-1979 in order to subset the data and not have to handle as many NA values.
+
+```{r merge rate and pop, echo=FALSE}
+# merge fertility_rate_df & country_pop_df by country code
+rate_pop_merged <- merge(fertility__rate_df,country_pop_df,by="Country.Code")
+head(rate_pop_merged)
+```
+
+I also want to merge the preg & fem_resp dataframes on CASEID, since both datasets represent data for females surveyed on their pregnancies from 2015-2017. I chose these years, since the fertility rate & country population datasets go up until 2016, so the years from 2015-2017 will represent the more recent years for looking at women's fertility and pregnancy experiences. I want to get a more current idea of what is affecting women's ability to have children. 
+
+```{r merge preg and resp, echo=FALSE}
+# merge preg & fem_resp dataframes on ï..CASEID
+preg_resp_merged <- merge(preg,fem_resp,by="ï..CASEID")
+```
+
+### What does the final data set look like?
+
+```{r final fertility, echo=FALSE}
+head(fertility_df)
+str(fertility_df)
+```
+```{r merged pop, echo=FALSE}
+head(rate_pop_merged)
+str(rate_pop_merged)
+```
+```{r merged nsfg, echo=FALSE}
+head(preg_resp_merged)
+str(preg_resp_merged)
+```
+
+### Questions for future steps.
+#### What do you not know how to do right now that you need to learn to import and cleanup your dataset?
+
+I believe I know everything I need to know right know in order to import and cleanup my dataset. I don't know how to merge all 5 of my datasets since they represent different forms of information pertaining to women's fertility, but I'm not sure if that's needed since it might be nice and more beneficial to deeper diver into each set of data depending on my problem questions. 
+
+
+### What information is not self-evident?
+#### Discuss how you plan to uncover new information in the data that is not self-evident.
+
+I think my next steps for each dataset (1 solo & 2 merged) is to analyze each of their variables and uncover how I can recode them and/or generate new columns based on existing ones to find new information. There are already many variables to investigate, but there is so much more we can learn by generating new variables that will build on already existing details & info. 
+
+I also want to look into the normality of the dataset variables, and also investigate the relationships between any of the variables to ensure there is no multicollinearity. 
+
+### What are different ways you could look at this data?
+#### What are different ways you could look at this data to answer the questions you want to answer?
+#### How could you summarize your data to answer key questions?
+
+One way I want to look at the data is by building aggregations out of it, especially for the fertility rate and country population merged dataset. I want to look into it country-wise and year-wise. It will allow me to visualize any trends (or lack there of) over the 36 years of data, which spans from the 1980's to the 2010's. By looking at the data year-wise, I want to understand how fertility rate has changed with the massive population growth in the world. With more people existing in the world, there are going to be more people assessing their reproductive abilities and depending on the outcome, it can have an impact on the fertility rate of a country/year. 
+
+The fertility_df only has 100 rows of data so it is quite smaller than the other 2 datasets, but it includes some great information on a  participant and their given symptoms/life habits in relation to a 'Normal' or 'Altered' diagnosis of fertility. I want to build logistic regression models on this data to uncover the variables which have the greatest effect on the diagnosis of a patient/study participant. I am trying to uncover the factors that play into one's fertility, and I think this dataset will be really useful for that information.
+
+I have a few questions regarding non-traditional methods of conception, i.e. adoption, IVF, etc. The merged preg & resp dataset provides information regarding a participant's birth control & conception methods even if they are not pregnant, which could show that they are having trouble conceiving. Therefore, this dataset will be really great for looking into those questions in how non-traditional methods are included in fertility data and information. I want to look at the distributions of these variables and understand how the sample can be generalized to the population of women trying to get pregnant. I also want to subset the data by women using traditional vs. non-traditional methods and do data comparisons to dive into how their fertility cases differ or are similar. 
+
+### How do you plan to slice and dice the data?
+#### Do you plan to slice and dice the data in different ways, create new variables, or join separate data frames to create new summary information? Explain.
+
+Already mentioned above :) 
+
+I created 2 merged datasets:
+1. Combined fertility_rate_df & country_pop_df
+2. Combined preg & fem_resp dataframes 
+
+### What types of plots and tables will help you to illustrate the findings to your questions?
+
+1. What is the weight of women's reproductive health in influencing a couple's ability to have children?
+
+- Frequency tables
+- Pie charts
+
+2. What is the current difference in birth rates from one country to another?
+- Bar charts with country code on the x-axis
+- Histogram of birth rates for each year represented in the merged dataset
+
+3. What is the average age for women to try to start having children?
+- Aggregation tables
+- Summary statistics
+
+4. How have non-traditional methods of having children influenced birth rate, such as adoption/IVF/etc?
+- Regression models, residual plots 
+- Correlation plots
+
+5. What resources are provided to people who are experiencing issues with infertility?
+- Subset table focused on resources mentioned in the preg & resp merged dataset
+- Count tables for number of people actually accessing and utilizing those resources
+- Bar charts for showing ranking of resources in terms of actual usage and popularity 
+
+6. What role does proper sex education play in fertility and reproductive health?
+- Regression models, residual plots
+- Correlation plots
+
+7. Does the current calculation of birth rate account for non-traditional methods of child delivery?
+- Summary stastistics
+- Aggregation of birth rate by method of conception -- querying
+
+8. What are the key factors that play a role in one's fertility, men and women?
+- Regression, residual plots
+- Correlation plots
+
+### Do you plan on incorporating any machine learning techniques to answer your research questions? Explain.
+
+K-Means Clustering would be interesting to use to cluster the various countries in the rate_pop_merged dataset by their fertility rates to understand which are more similar and also different from eachother. It will give a global perspective and allow for more understanding on how the similar countries' characteristics play into/affect their fertility rates. I have never given much thought to how a country itself can affect its citizens' fertility, and by visualizing/grouping countries based on their fertility rates, I would hopefully be able to understand this fact in more detail. 
+
+I could also potentially use the machine learning technique of K-Nearest Neighbors to classify new records into the groupings of either being fertile or infertile, in terms of ease of conception. I would have to deliberate on which variables to include for the groupings, but I think this would be very interesting for seeing how fertility can be precited for an individual baed on the values of the given prediction variables. 
+
+### Questions for future steps.
+
+1. How are machine learning techniques applied using R?
+2. How do you create aggregation/summary tables effectively in R?
+3. What is the best way to rearrange data? What ideas/thinking should go into arranging data in an usable and valuable manner?
