@@ -120,12 +120,12 @@ str(fertility_df)
 
 ```{r merged pop, echo=TRUE}
 dplyr::glimpse(rate_pop_merged)
-str(rate_pop_merged)
+#str(rate_pop_merged)
 ```
 
 ```{r merged nsfg, echo=TRUE}
 dplyr::glimpse(preg_resp_merged)
-str(preg_resp_merged)
+#str(preg_resp_merged)
 ```
 
 ### Questions for future steps.
@@ -141,9 +141,10 @@ I think my next steps for each dataset (1 solo & 2 merged) is to analyze each of
 
 I also want to look into the normality of the dataset variables, and also investigate the relationships between any of the variables to ensure there is no multicollinearity. 
 
-### What are different ways you could look at this data?
-#### What are different ways you could look at this data to answer the questions you want to answer?
-#### How could you summarize your data to answer key questions?
+### Below questions are answered in same section
+1. What are different ways you could look at this data?
+2. What are different ways you could look at this data to answer the questions you want to answer?
+3. How could you summarize your data to answer key questions?
 
 One way I want to look at the data is by building aggregations out of it, especially for the fertility rate and country population merged dataset. I want to look into it country-wise and year-wise. It will allow me to visualize any trends (or lack there of) over the 36 years of data, which spans from the 1980's to the 2010's. By looking at the data year-wise, I want to understand how fertility rate has changed with the massive population growth in the world. With more people existing in the world, there are going to be more people assessing their reproductive abilities and depending on the outcome, it can have an impact on the fertility rate of a country/year. 
 
@@ -151,14 +152,13 @@ The fertility_df only has 100 rows of data so it is quite smaller than the other
 
 I have a few questions regarding non-traditional methods of conception, i.e. adoption, IVF, etc. The merged preg & resp dataset provides information regarding a participant's birth control & conception methods even if they are not pregnant, which could show that they are having trouble conceiving. Therefore, this dataset will be really great for looking into those questions in how non-traditional methods are included in fertility data and information. I want to look at the distributions of these variables and understand how the sample can be generalized to the population of women trying to get pregnant. I also want to subset the data by women using traditional vs. non-traditional methods and do data comparisons to dive into how their fertility cases differ or are similar. 
 
-### How do you plan to slice and dice the data?
-#### Do you plan to slice and dice the data in different ways, create new variables, or join separate data frames to create new summary information? Explain.
+### Slicing & Dicing
+##### Do you plan to slice and dice the data in different ways, create new variables, or join separate data frames to create new summary information? Explain. 
 
-Already mentioned above :) 
+I answered other parts of this question in the paragraph above but in terms of joining sepeate data frames, I created 2 merged datasets:
 
-I created 2 merged datasets:
-1. Combined fertility_rate_df & country_pop_df
-2. Combined preg & fem_resp dataframes 
+- Combined fertility_rate_df & country_pop_df
+- Combined preg & fem_resp dataframes 
 
 ### What types of plots and tables will help you to illustrate the findings to your questions?
 
