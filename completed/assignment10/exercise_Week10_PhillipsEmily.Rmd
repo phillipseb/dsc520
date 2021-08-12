@@ -1,0 +1,394 @@
+---
+title: "exercise_Week10_PhillipsEmily"
+author: "Emily Phillips"
+date: "8/10/2021"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+# Loading package
+library(e1071)
+library(caTools)
+library(class)
+library(factoextra)
+library(purrr)
+```
+
+# K-Nearest Neighbors
+
+Regression algorithms are used to predict numeric quantity while classification algorithms predict categorical outcomes. A spam filter is an example use case for a classification algorithm. The input dataset is emails labeled as either spam (i.e. junk emails) or ham (i.e. good emails). The classification algorithm uses features extracted from the emails to learn which emails fall into which category.
+
+
+```{r data, echo=FALSE}
+
+#Label can be 0 or 1
+binary_df <- read.csv("http://content.bellevue.edu/cst/dsc/520/id/resources/binary-classifier-data.csv")
+head(binary_df)
+
+#Label variable can be 0,1,2
+trinary_df <- read.csv("http://content.bellevue.edu/cst/dsc/520/id/resources/trinary-classifier-data.csv")
+head(trinary_df)
+```
+
+
+1. Plot the data from each dataset using a scatter plot.
+
+### Binary dataset plot
+
+```{r plot binary, echo=FALSE}
+ggplot(binary_df) +geom_point(aes(x = x, y= y,color=label))
+```
+### Trinary dataset plot
+
+```{r plot trinary, echo=FALSE}
+ggplot(trinary_df) +geom_point(aes(x = x, y= y,color=label))
+```
+
+
+2. The k nearest neighbors algorithm categorizes an input value by looking at the labels for the k nearest points and assigning a category based on the most common label. In this problem, you will determine which points are nearest by calculating the Euclidean distance between two points. 
+
+
+3. Fitting a model is when you use the input data to create a predictive model. There are various metrics you can use to determine how well your model fits the data. For this problem, you will focus on a single metric, accuracy. Accuracy is simply the percentage of how often the model predicts the correct result. If the model always predicts the correct result, it is 100% accurate. If the model always predicts the incorrect result, it is 0% accurate.
+
+Fit a k nearest neighbors’ model for each dataset for k=3, k=5, k=10, k=15, k=20, and k=25. Compute the accuracy of the resulting models for each value of k. Plot the results in a graph where the x-axis is the different values of k and the y-axis is the accuracy of the model.
+
+### Binary dataset
+
+```{r k-nn binary, echo=FALSE}
+# Splitting data into train and test data
+#80% for training data
+#20% for test data
+split <- sample.split(binary_df, SplitRatio = 0.8)
+
+#1 = TRUE, 0 =FALSE
+train_cl <- subset(binary_df, split == 1)
+test_cl <- subset(binary_df, split == 0)
+
+# Feature Scaling -- only use non-label columns
+train_scale <- scale(train_cl[, 2:3])
+test_scale <- scale(test_cl[, 2:3])
+```
+```{r binary k3, echo=FALSE}
+# Fitting KNN Model to training dataset
+classifier_knn3 <- knn(train = train_scale,
+                      test = test_scale,
+                      cl = train_cl$label,
+                      k = 3)
+classifier_knn3
+
+misClassError3 <- mean(classifier_knn3 != test_cl$label)
+print(paste('Bi Accuracy k3 =', 1-misClassError3))
+```
+```{r binary k5, echo=FALSE}
+# Fitting KNN Model to training dataset
+classifier_knn5 <- knn(train = train_scale,
+                      test = test_scale,
+                      cl = train_cl$label,
+                      k = 5)
+
+misClassError5 <- mean(classifier_knn5 != test_cl$label)
+print(paste('Bi Accuracy k5 =', 1-misClassError5))
+```
+```{r binary k10, echo=FALSE}
+# Fitting KNN Model to training dataset
+classifier_knn10 <- knn(train = train_scale,
+                      test = test_scale,
+                      cl = train_cl$label,
+                      k = 10)
+
+misClassError10 <- mean(classifier_knn10 != test_cl$label)
+print(paste('Bi Accuracy k10 =', 1-misClassError10))
+```
+```{r binary k15, echo=FALSE}
+# Fitting KNN Model to training dataset
+classifier_knn15 <- knn(train = train_scale,
+                      test = test_scale,
+                      cl = train_cl$label,
+                      k = 15)
+
+misClassError15 <- mean(classifier_knn15 != test_cl$label)
+print(paste('Bi Accuracy k15 =', 1-misClassError15))
+```
+```{r binary k20, echo=FALSE}
+# Fitting KNN Model to training dataset
+classifier_knn20 <- knn(train = train_scale,
+                      test = test_scale,
+                      cl = train_cl$label,
+                      k = 20)
+
+misClassError20 <- mean(classifier_knn20 != test_cl$label)
+print(paste('Bi Accuracy k20 =', 1-misClassError20))
+```
+```{r binary k25, echo=FALSE}
+# Fitting KNN Model to training dataset
+classifier_knn25 <- knn(train = train_scale,
+                      test = test_scale,
+                      cl = train_cl$label,
+                      k = 25)
+
+misClassError25 <- mean(classifier_knn25 != test_cl$label)
+print(paste('Bi Accuracy k25 =', 1-misClassError25))
+```
+```{r binary accuracy plot, echo=FALSE}
+x <- c(3,5,10,15,20,25)
+y <- c(misClassError3,misClassError5,misClassError10,misClassError15,misClassError20,misClassError25)
+
+ggplot() +geom_point(aes(x = x, y= y)) + geom_line(aes(x=x,y=y)) + xlab("k-value") + ylab("Accuracy")
+```
+
+### Trinary dataset
+
+```{r k-nn trinary, echo=FALSE}
+# Splitting data into train and test data
+#80% for training data
+#20% for test data
+split_tri <- sample.split(trinary_df, SplitRatio = 0.8)
+
+#1 = TRUE, 0 =FALSE
+train_c2 <- subset(trinary_df, split_tri == "TRUE")
+test_c2 <- subset(trinary_df, split_tri == "FALSE")
+
+# Feature Scaling -- only use non-label columns
+train_scale2 <- scale(train_c2[, 2:3])
+test_scale2 <- scale(test_c2[, 2:3])
+```
+
+```{r trinary k3, echo=FALSE}
+# Fitting KNN Model to training dataset
+tri_classifier_knn3 <- knn(train = train_scale2,
+                      test = test_scale2,
+                      cl = train_c2$label,
+                      k = 3)
+tri_classifier_knn3
+
+tri_misClassError3 <- mean(tri_classifier_knn3 != test_c2$label)
+print(paste('Tri Accuracy k3 =', 1-tri_misClassError3))
+```
+```{r trinary k5, echo=FALSE}
+# Fitting KNN Model to training dataset
+tri_classifier_knn5 <- knn(train = train_scale2,
+                      test = test_scale2,
+                      cl = train_c2$label,
+                      k = 5)
+
+tri_misClassError5 <- mean(tri_classifier_knn5 != test_c2$label)
+print(paste('Tri Accuracy k5 =', 1-tri_misClassError5))
+```
+```{r trinary k10, echo=FALSE}
+# Fitting KNN Model to training dataset
+tri_classifier_knn10 <- knn(train = train_scale2,
+                      test = test_scale2,
+                      cl = train_c2$label,
+                      k = 10)
+
+tri_misClassError10 <- mean(tri_classifier_knn10 != test_c2$label)
+print(paste('Tri Accuracy k10 =', 1-tri_misClassError10))
+```
+```{r trinary k15, echo=FALSE}
+# Fitting KNN Model to training dataset
+tri_classifier_knn15 <- knn(train = train_scale2,
+                      test = test_scale2,
+                      cl = train_c2$label,
+                      k = 15)
+
+tri_misClassError15 <- mean(tri_classifier_knn15 != test_c2$label)
+print(paste('Tri Accuracy k15 =', 1-tri_misClassError15))
+```
+```{r trinary k20, echo=FALSE}
+# Fitting KNN Model to training dataset
+tri_classifier_knn20 <- knn(train = train_scale2,
+                      test = test_scale2,
+                      cl = train_c2$label,
+                      k = 20)
+
+tri_misClassError20 <- mean(tri_classifier_knn20 != test_c2$label)
+print(paste('Tri Accuracy k20 =', 1-tri_misClassError20))
+```
+
+```{r trinary k25, echo=FALSE}
+# Fitting KNN Model to training dataset
+tri_classifier_knn25 <- knn(train = train_scale2,
+                      test = test_scale2,
+                      cl = train_c2$label,
+                      k = 25)
+
+tri_misClassError25 <- mean(tri_classifier_knn25 != test_c2$label)
+print(paste('Tri Accuracy k25 =', 1-tri_misClassError25))
+```
+```{r trinary accuracy plot, echo=FALSE}
+x <- c(3,5,10,15,20,25)
+y <- c(tri_misClassError3,tri_misClassError5,tri_misClassError10,tri_misClassError15,tri_misClassError20,tri_misClassError25)
+
+ggplot() +geom_point(aes(x = x, y= y)) + geom_line(aes(x=x,y=y)) + xlab("k-value") + ylab("Accuracy")
+```
+
+4. Looking back at the plots of the data, do you think a linear classifier would work well on these datasets?
+How does the accuracy of your logistic regression classifier from last week compare?  Why is the accuracy different between these two methods?
+
+From looking back at the plots, I don't think a linear classifier would have worked well on these datasets. It would be very difficult to draw linear boundaries between the label clusters for both the binary & trinary datasets. There is no good linear separator between the distributions.
+
+The accuracy of my logistic regression classifier was ~47%. Therefore, the non-linear classifier of kNN is already much better given that there are 90% or higher depending on the k-value. 
+
+The accuracy is different between these two methods, due to the use of a linear classifier vs. a non-linear classification. Given that the classification of these labels for the datasets is not linear in boundary nature, then a non-linear classifier will give better accuracy than the linear one from last week (logistic regression).
+
+# K-Means Clustering -- No labeled data
+
+
+```{r data2, echo=FALSE}
+
+cluster_df <- read.csv("http://content.bellevue.edu/cst/dsc/520/id/resources/clustering-data.csv")
+head(cluster_df)
+```
+
+1. Plot the dataset using a scatter plot.
+
+```{r plot cluster, echo=FALSE}
+ggplot(cluster_df) +geom_point(aes(x = x, y= y))
+```
+
+
+2. Fit the dataset using the k-means algorithm from k=2 to k=12. Create a scatter plot of the resultant clusters for each value of k.
+
+```{r k-means cluster, echo=FALSE}
+# Compute k-means with k = 2
+#nstart = 25, R will try 25 different random starting assignments and then select the best results corresponding
+#to the one  with the lowest within cluster variation
+set.seed(123)
+km.res2 <- kmeans(cluster_df, 2, nstart = 25)
+
+km.res2$cluster <- as.factor(km.res2$cluster)
+ggplot(cluster_df, aes(x, y, color = km.res2$cluster)) + geom_point()
+```
+```{r k-means cluster3, echo=FALSE}
+# Compute k-means with k = 3
+#nstart = 25, R will try 25 different random starting assignments and then select the best results corresponding
+#to the one  with the lowest within cluster variation
+set.seed(123)
+km.res3 <- kmeans(cluster_df, 3, nstart = 25)
+
+km.res3$cluster <- as.factor(km.res3$cluster)
+ggplot(cluster_df, aes(x, y, color = km.res3$cluster)) + geom_point()
+```
+```{r k-means cluster4, echo=FALSE}
+# Compute k-means with k = 4
+#nstart = 25, R will try 25 different random starting assignments and then select the best results corresponding
+#to the one  with the lowest within cluster variation
+set.seed(123)
+km.res4 <- kmeans(cluster_df, 4, nstart = 25)
+
+km.res4$cluster <- as.factor(km.res4$cluster)
+ggplot(cluster_df, aes(x, y, color = km.res4$cluster)) + geom_point()
+```
+```{r k-means cluster5, echo=FALSE}
+# Compute k-means with k = 5
+#nstart = 25, R will try 25 different random starting assignments and then select the best results corresponding
+#to the one  with the lowest within cluster variation
+set.seed(123)
+km.res5 <- kmeans(cluster_df, 5, nstart = 25)
+
+km.res5$cluster <- as.factor(km.res5$cluster)
+ggplot(cluster_df, aes(x, y, color = km.res5$cluster)) + geom_point()
+```
+```{r k-means cluster6, echo=FALSE}
+# Compute k-means with k = 6
+#nstart = 25, R will try 25 different random starting assignments and then select the best results corresponding
+#to the one  with the lowest within cluster variation
+set.seed(123)
+km.res6 <- kmeans(cluster_df, 6, nstart = 25)
+
+km.res6$cluster <- as.factor(km.res6$cluster)
+ggplot(cluster_df, aes(x, y, color = km.res6$cluster)) + geom_point()
+```
+```{r k-means cluster7, echo=FALSE}
+# Compute k-means with k = 7
+#nstart = 25, R will try 25 different random starting assignments and then select the best results corresponding
+#to the one  with the lowest within cluster variation
+set.seed(123)
+km.res7 <- kmeans(cluster_df, 7, nstart = 25)
+
+km.res7$cluster <- as.factor(km.res7$cluster)
+ggplot(cluster_df, aes(x, y, color = km.res7$cluster)) + geom_point()
+```
+```{r k-means cluster8, echo=FALSE}
+# Compute k-means with k = 8
+#nstart = 25, R will try 25 different random starting assignments and then select the best results corresponding
+#to the one  with the lowest within cluster variation
+set.seed(123)
+km.res8 <- kmeans(cluster_df, 8, nstart = 25)
+
+km.res8$cluster <- as.factor(km.res8$cluster)
+ggplot(cluster_df, aes(x, y, color = km.res8$cluster)) + geom_point()
+```
+```{r k-means cluster9, echo=FALSE}
+# Compute k-means with k = 9
+#nstart = 25, R will try 25 different random starting assignments and then select the best results corresponding
+#to the one  with the lowest within cluster variation
+set.seed(123)
+km.res9 <- kmeans(cluster_df, 9, nstart = 25)
+
+km.res9$cluster <- as.factor(km.res9$cluster)
+ggplot(cluster_df, aes(x, y, color = km.res9$cluster)) + geom_point()
+```
+```{r k-means cluster10, echo=FALSE}
+# Compute k-means with k = 10
+#nstart = 25, R will try 25 different random starting assignments and then select the best results corresponding
+#to the one  with the lowest within cluster variation
+set.seed(123)
+km.res10 <- kmeans(cluster_df, 10, nstart = 25)
+
+km.res10$cluster <- as.factor(km.res10$cluster)
+ggplot(cluster_df, aes(x, y, color = km.res10$cluster)) + geom_point()
+```
+```{r k-means cluster11, echo=FALSE}
+# Compute k-means with k = 11
+#nstart = 25, R will try 25 different random starting assignments and then select the best results corresponding
+#to the one  with the lowest within cluster variation
+set.seed(123)
+km.res11 <- kmeans(cluster_df, 11, nstart = 25)
+
+km.res11$cluster <- as.factor(km.res11$cluster)
+ggplot(cluster_df, aes(x, y, color = km.res11$cluster)) + geom_point()
+```
+```{r k-means cluster12, echo=FALSE}
+# Compute k-means with k = 12
+#nstart = 25, R will try 25 different random starting assignments and then select the best results corresponding
+#to the one  with the lowest within cluster variation
+set.seed(123)
+km.res12 <- kmeans(cluster_df, 12, nstart = 25)
+
+km.res12$cluster <- as.factor(km.res12$cluster)
+ggplot(cluster_df, aes(x, y, color = km.res12$cluster)) + geom_point()
+```
+
+3. As k-means is an unsupervised algorithm, you cannot compute the accuracy as there are no correct values to compare the output to. Instead, you will use the average distance from the center of each cluster as a measure of how well the model fits the data. To calculate this metric, simply compute the distance of each data point to the center of the cluster it is assigned to and take the average value of all of those distances.
+- Calculate this average distance from the center of each cluster for each value of k and plot it as a line chart where k is the x-axis and the average distance is the y-axis.
+
+```{r elbow, echo=FALSE}
+set.seed(123)
+
+# function to compute total within-cluster sum of square 
+wss <- function(k) {
+  kmeans(cluster_df, k, nstart = 25)$tot.withinss
+}
+
+# Compute and plot wss for k = 2 to k = 12
+k.values <- 2:12
+
+# extract wss for 2-12 clusters
+wss_values <- map_dbl(k.values, wss)
+
+plot(k.values, wss_values,
+       type="b", pch = 19, frame = FALSE, 
+       xlab="Number of clusters K",
+       ylab="Average Distances")
+```
+       
+4. One way of determining the “right” number of clusters is to look at the graph of k versus average distance and finding the “elbow point”. Looking at the graph you generated in the previous example, what is the elbow point for this dataset?
+
+The location of a bend(elbow) in the plot is generally considered an indicator of the appropriate number of clusters.
+
+From looking at this plot of k vs. average distance, I would think the elbow point for this dataset or the appropriate number of clusters is 5. 
+
+
