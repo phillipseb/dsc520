@@ -9,6 +9,8 @@ output: pdf_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+# Final Project Step 1 
+
 ### Introduction
 The idea and question of fertility has been a topic that I have been researching for some years now, especially being a young woman. It has become more of a prevalent issue, at least in the United States, for women to struggle with infertility and therefore not being able to have children naturally or maybe at all. In terms of birth rates, I would think that the issue of reproductive health in women (and maybe even men) has an impact on the number of kids that are born year-to-year in the country. Therefore, the problem that I want to research is the problem of infertility in America and how it has impacted birth rate. In order for any country's population to grow, people need to be born, and it could have a huge impact on the population if people experience issues with fertility and reproductive health. With the concept of infertility, I would also like to research how various factors influence one's fertility and whether we can predict the fertility of an individual based on their demographic and environmental variables.
 
@@ -91,25 +93,28 @@ In terms of partiality, I think it will be difficult to address this problem at 
 - Generalization of analysis on one region to the greater regions -- EX) USA to the world
 - Merging of datasets, especially when bringing in data on men & women
 
+# Final Project Step 2 
+
 ### How to import and clean my data
-```{r setup, include=FALSE}
+```{r setup2, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(car)
 library(mlogit)
 library(Hmisc)
+library(dplyr)
 ```
 
-```{r fertility, echo=FALSE}
+```{r fertility, echo=TRUE, results='hide'}
 fertility_df <- read.csv("fertility.csv")
 head(fertility_df)
 ```
 
-```{r world bank, echo=FALSE}
+```{r world bank, echo=TRUE,results='hide'}
 fertility__rate_df <- read.csv("fertility_rate.csv")
 country_pop_df <- read.csv("country_population.csv")
 ```
 
-```{r NSFG, echo=FALSE}
+```{r NSFG, echo=TRUE, results='hide'}
 preg <- read.csv("2015_2017_FemPregData.csv")
 fem_resp <- read.csv("2015_2017_FemRespData.csv")
 
@@ -122,10 +127,10 @@ sapply(fertility_df, function(x) sum(is.na(x)))
 No NA values in any of the columns in the 1st fertility dataset.
 
 
-```{r NA vals rate, echo=FALSE}
+```{r NA vals rate, echo=TRUE}
 sapply(fertility__rate_df, function(x) sum(is.na(x)))
 ```
-```{r NA vals pop, echo=FALSE}
+```{r NA vals pop, echo=TRUE, results='hide'}
 sapply(country_pop_df, function(x) sum(is.na(x)))
 ```
 I am removing Indicator.Name & Indicator.Code from both fertility_rate_df & country_pop_df because these columns have the same values for each row and don't give any extra information around the datasets and their specifications. 
@@ -137,7 +142,7 @@ The country_pop_df dataset does not have as many NA values in the year columns a
 I am also going to replace the NAs in the rest of the year columns 1980-2016 with the median value for the year column. I chose median over mean, since I don't want the value to be affected by the extreme values and countries have highly varying population sizes so the fertility rates and population numbers will be quite different. 
 
 
-```{r subset years, echo=FALSE}
+```{r subset years, echo=T, results='hide'}
 # exclude variables v1, v2, v3
 cols <- names(fertility__rate_df) %in% c("Indicator.Name","Indicator.Code","X1960", "X1961", "X1962","X1963","X1964","X1965","X1966","X1967","X1968","X1969","X1970","X1971","X1972","X1973","X1974","X1975","X1976","X1977","X1978","X1979")
 cols2 <- names(country_pop_df) %in% c("Indicator.Name","Indicator.Code","X1960", "X1961", "X1962","X1963","X1964","X1965","X1966","X1967","X1968","X1969","X1970","X1971","X1972","X1973","X1974","X1975","X1976","X1977","X1978","X1979")
@@ -147,29 +152,29 @@ fertility__rate_df<- fertility__rate_df[!cols]
 country_pop_df <- country_pop_df[!cols2]
 ```
 
-```{r subset years, echo=FALSE}
+```{r subset years2, echo=TRUE}
 fertility__rate_df[,5:41] <- impute(fertility__rate_df[,3:39], fun = median)
 
 country_pop_df[,5:41] <- impute(country_pop_df[,3:39], fun = median)
 ```
 
-```{r NA vals preg, echo=FALSE}
+```{r NA vals preg, echo=T, results='hide'}
 colSums(is.na(preg))
 preg[,colSums(is.na(preg)) >0]
 ```
 148 of the 380 variables contained NA values. The NA counts range from a couple hundred to ~5500 which is basically the number of rows in the dataset as is row (numRows = 5554). Given that there are already a great amount of columns in this dataset, I decided to remove all of the columns with any NA values since I think the rest of the data is already representative of the females that were surveyed about their pregnancies. 
 
-```{r NA vals remove preg, echo=FALSE}
+```{r NA vals remove preg, echo=TRUE}
 preg <- preg[ , colSums(is.na(preg)) == 0]
 ```
 
-```{r NA vals resp, echo=FALSE}
+```{r NA vals resp, echo=T, results='hide'}
 colSums(is.na(fem_resp))
 fem_resp[,colSums(is.na(fem_resp)) >0]
 ```
 2,792 of the 3,024 total variables in the female resp dataset have NA values. The count of these NA values is mostly very high such as being around 5,554 which is the total number of rows in the dataset as is, which would mean that the entire column contains NAs. Given that this dataset already has many columns and many are not applicable to my problem/question, I am going to remove all columns with any NA values to make the dataset easier to consume, analyze and utilize. 
 
-```{r NA vals remove resp, echo=FALSE}
+```{r NA vals remove resp, echo=TRUE}
 fem_resp <- fem_resp[ , colSums(is.na(fem_resp)) == 0]
 ```
 
@@ -177,7 +182,7 @@ fem_resp <- fem_resp[ , colSums(is.na(fem_resp)) == 0]
 
 I want to merge the fertility_rate_df & country_pop_df datasets on country code, given that both datasets provide data on the same countries over the 36 years from 1980 - 2016. I took out the year variables from 1960-1979 in order to subset the data and not have to handle as many NA values.
 
-```{r merge rate and pop, echo=FALSE}
+```{r merge rate and pop, echo=TRUE, results='hide'}
 # merge fertility_rate_df & country_pop_df by country code
 rate_pop_merged <- merge(fertility__rate_df,country_pop_df,by="Country.Code")
 head(rate_pop_merged)
@@ -185,24 +190,24 @@ head(rate_pop_merged)
 
 I also want to merge the preg & fem_resp dataframes on CASEID, since both datasets represent data for females surveyed on their pregnancies from 2015-2017. I chose these years, since the fertility rate & country population datasets go up until 2016, so the years from 2015-2017 will represent the more recent years for looking at women's fertility and pregnancy experiences. I want to get a more current idea of what is affecting women's ability to have children. 
 
-```{r merge preg and resp, echo=FALSE}
+```{r merge preg and resp, echo=TRUE, results='hide'}
 # merge preg & fem_resp dataframes on ï..CASEID
 preg_resp_merged <- merge(preg,fem_resp,by="ï..CASEID")
 ```
 
 ### What does the final data set look like?
 
-```{r final fertility, echo=FALSE}
-head(fertility_df)
+```{r final fertility, echo=TRUE}
+dplyr::glimpse(fertility_df)
 str(fertility_df)
 ```
-```{r merged pop, echo=FALSE}
-head(rate_pop_merged)
-str(rate_pop_merged)
+```{r merged pop, echo=TRUE}
+dplyr::glimpse(rate_pop_merged)
+#str(rate_pop_merged)
 ```
-```{r merged nsfg, echo=FALSE}
-head(preg_resp_merged)
-str(preg_resp_merged)
+```{r merged nsfg, echo=TRUE}
+dplyr::glimpse(preg_resp_merged)
+#str(preg_resp_merged)
 ```
 
 ### Questions for future steps.
@@ -284,3 +289,67 @@ I could also potentially use the machine learning technique of K-Nearest Neighbo
 1. How are machine learning techniques applied using R?
 2. How do you create aggregation/summary tables effectively in R?
 3. What is the best way to rearrange data? What ideas/thinking should go into arranging data in an usable and valuable manner?
+
+# Final Project Step 3 
+
+### Introduction.
+
+  Infertility is a problem that affects every individual, male or female, in every part of the world; it is a global issue. Unfortunately, even with being such a major problem, there is still minimal information and evidence around what contributes to infertility and how people can possibly improve their fertility and/or prevent infertility. 
+  
+  It is a topic that desires more visibility and research, and I think statistical analysis and investigation can make great strides in the progress towards increasing one's fertility awareness and condition. Demographic factors, health factors and environmental factors seem to play a role in fertility and possibly infertility, and with this effort of building a model, I aimed to answer the question of: "what factors play a significant role in predicting an individual's possibility of being infertile?". I wanted to use fertility diagnosis as a categorical outcome variable for my model and apply logistic regression to understand which variables can help predict this binary outcome (fertile or infertile). 
+
+### The problem statement you addressed. 
+
+  The ambiguity around people's fertility, until they are at the time in their lives to start having children, is a concern that should be addressed as early as possible by identifying the factors that play into fertility and developing detection methods for infertility to be able to provide proper aid and support. 
+
+### How you addressed this problem statement
+
+  I started out with five datasets for addressing my problem statement: country_pop_df, fem_resp, fertility_rate_df, fertility_df & preg. 
+  1. country_pop_df: Countries' population numbers from 1960-2016
+  2. fertility_rate_df: Countries' fertility rates from 1960-2016
+  3. fem_resp: Female respondents' information from a survey of females around their health, life events, possible previous pregnancies, etc.
+  4. preg: NSFG survey data for pregnant females
+  5. fertility_df: - 100 volunteers provided a semen sample that was analyzed according to the WHO 2010 criteria deciding whether the individual was fertile
+  
+  I merged two sets of datasets:
+  1. country_pop_df & fertility_rate_df (countries' population numbers & fertility rates in one dataset)
+  2. fem_resp & preg (the females' survey responses and pregnancy information in one dataset)
+  
+  By merging the datasets, it allowed for me to have all applicable information in one place. It made it easier to conduct summary statistics and analyze the variables in the dataset to draw insights such as relationships between variables, distributions, and finally predictive modeling. 
+  
+### Analysis
+
+  There are a few models that I would want to build for answering the questions around my problem statement.
+  
+  One of those models would be a logistic model, using the fertility_df & merged 'preg_resp_merged' datasets. I would utilize an outcome variable which depicts fertility as a binary categorical variable with values of 'Fertile' & 'Infertile'. There are many variables in both of those datsets, and so, I would attempt to uncover which variables hold the greatest predictive measure in identifying whether one is infertile. Fertility would be my baseline for the model, as I want to uncover more information around people's infertility since that is the main problem at hand. 
+  From building these logistic models with various explanatory variables and combinations, I would run comparisons between them to understand their varying strengths and precisions of fit. I want to ensure the models are providing accurate predictions, and it would take some trial and effort to uncover the variables which have the greatest influence on uncovering a solution to my problem statement.
+  
+  Also, with the merged 'rate_pop_merged' dataset, I would suggest utilizing a time series analysis model which would allow us to draw meaningful insights regarding fertility rate in terms of population growth over time for the countries in the world. This dataset holds information around the years from 1960-2016 (I subsetted to be from 1980-2016). From having such a large range of dates to apply our model on, we can use previous data to predict future results for countries and their fertility rates, which could also help us understand how the people in their countries will be with their fertility and how resources can be allocated to plan accordingly. 
+  
+  A big focus of mine is on early detection and prevention of infertility, and I believe both of those models will help with those principles at both the individual characteristic level and the global resource level. 
+
+### Implications
+
+  The insights from my analysis can help the target audience of post-puberty humans by giving them understanding and knowledge around their fertility health and how they can hopefully take proper action if infertility is a concern that is identified for them. 
+  
+  I read an article about how machine learning has been used on patients who think they may have dementia by comparing their brain scans with a database of dementia patients' scans to diagnose and/or decide whether the patients have a possibility of developing the neurological disorder. Therefore, from the results of this technique, the patients can be provided with proper care to ensure that they are prepared for an onset of dementia and can be as ready as possible for what's to come. 
+  
+  The target audience of this analysis will hopefully be provided with a similar outcome as these dementia patients. They will be able to understand if there is a possibility of being infertile and from there, they can be guided on how to prepare and possibly increase their chances/odds of having children. If the degree of their fertility is not ideal for natural conception,they can also start looking into other conception methods such as adoption and IVF, earlier than normal, since they are options that require time, money, and energy. 
+
+### Limitations
+
+  Time is obviously a limitation of this analysis :) with more time, I would hope to take this analysis from data exploration to model building to analysis of results and possibly repetition of any steps after and in-between. There is a lot of data to explore in relation to fertility, and I would love to have the time to spend on diving into this subject and how statistics can be utilized to increase awareness, detection and prevention.
+  
+  I would like to gain more education on incorporating categorical variables into modeling and exactly how to interpret them when put into models' output. I believe they can hold huge weight in their factors/coding for the problem or question at hand, and I would hate to leave them out just because I don't have a ton of experience with using and understanding their impact on the outcome variable at each level of the category. 
+  
+  Fertility is a major issue and a global issue as mentioned earlier. I worry that any one data set or even two merged together would not be enough to generalize the sample model results to the population. In doing this analysis, I would want to ensure that I can address the problem at a higher degree, and this could only come from having proper data that is representative of the world's population and the factors that affect both men and women. 
+  
+  Given the health nature of this issue with infertility, I would love to see and explore how artificial intelligence could be incorporated into the building out of the models and their predictions. It is an incredibly powerful too that is making waves in how computers can be trained to think and behave like humans. Doctors and scientists have been attempting to dive into infertility for many years, and I think with the help of smart technology and behavioral modeling, there could be major insights gained around one's fertility and possible infertility. 
+
+### Concluding Remarks
+
+  Detection and prevention are the key words in this analysis of fertility and the modeling recommendations. There is major predictive power that can be yielded from building models on theses datasets regarding females' health & wellness and countries' fertility numbers. In examining the data and diving into the key factors that influence fertility and how countries can better prepare for their populations, we can be prepared as a nation for issues around people being able to have children when they are ultimately ready to.
+  
+  There is major stress, pain and exhaustion that is caused from the battle of infertility and trying to find ways to conceive children when it is not in the body's best favor. With modeling and predictive insights, we can build a better global system that is educated around the issue of infertility and in how people can be prepared for their futures as early and as soon as possible. We all deserve to know what is happening in our body, and the earlier we can detect any problems against healthy living, the better. 
+  
+  Here's to a better reproductive future for our world and its people!
